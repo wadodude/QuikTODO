@@ -1,0 +1,7 @@
+
+Incomplete:
+
+        07/18/2013    4    Add Date / day to right side, updates minute
+        07/18/2013    4    add drag and drop to prioritize tasks
+        07/18/2013    4    Add a timeline window from icon
+        07/18/2013    4    Change other message boxes to use prompt window

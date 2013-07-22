@@ -1,6 +1,0 @@
-E:\TaskPriority\ProjectNoName\obj\Release\MainWindow.baml
-E:\TaskPriority\ProjectNoName\obj\Release\MainWindow.g.cs
-E:\TaskPriority\ProjectNoName\obj\Release\App.g.cs
-E:\TaskPriority\ProjectNoName\obj\Release\GeneratedInternalTypeHelper.g.cs
-E:\TaskPriority\ProjectNoName\obj\Release\ProjectNoName_MarkupCompile.cache
-E:\TaskPriority\ProjectNoName\obj\Release\ProjectNoName_MarkupCompile.lref
