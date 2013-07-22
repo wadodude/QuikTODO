@@ -1,0 +1,13 @@
+**s0h1d0c0**
+
+*Completed:
+
+        07/18/2013    4    add drag and drop to prioritize tasks for vertical listbox
+        07/18/2013    4    Change other message boxes to use prompt window
+        07/18/2013    4    Add Date / day to right side, updates minute
+
+**Incomplete:
+
+        07/18/2013    1    Add a timeline window from icon \n 1. horizontal listbox with some kind of sliders to move tasks to different time \n 2. view all tasks for the day left to right
+        07/18/2013    2    change the selected style for file structure
+        07/18/2013    4    Add Reminder window and frequency choices
