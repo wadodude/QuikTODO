@@ -11,6 +11,37 @@
             <DataTemplate DataType="{x:Type v:DetailsViewModel}">
                 <v:DetailsWindow />
             </DataTemplate>
+            <Style x:Key="DefaultLabelStyle" TargetType="{x:Type Label}">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+            </Style>
+            <Style x:Key="DefaultCheckBoxStyle" TargetType="{x:Type CheckBox}">
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="DisplayMemberPath" Value="Description"/>
+            </Style>
+            <Style x:Key="EnumComboStyle" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+                <Setter Property="IsTextSearchEnabled" Value="True" />
+                <Setter Property="DisplayMemberPath" Value="Value" />
+                <Setter Property="TextSearch.TextPath" Value="Value.EntityValue" />
+                <Setter Property="Height" Value="22" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+            </Style>
+            <Style TargetType="{x:Type v:TimeControl}">
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="FontStretch" Value="UltraExpanded"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="MaxLength" Value="7"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="Width" Value="95"/>
+            </Style>
+            <Style TargetType="{x:Type MenuItem}">
+                <Setter Property="Background" Value="Black" />
+                <Setter Property="Foreground" Value="White" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

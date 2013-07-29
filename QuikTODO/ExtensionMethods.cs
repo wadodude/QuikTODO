@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -7,6 +8,13 @@ namespace QuikTODO
 {
     public static class ExtensionMethods
     {
+        public static string ToEnumDescriptionString(this object obj)
+        {
+            var array = obj.GetType().GetField(obj.ToString()).GetCustomAttributes(false);
+            DescriptionAttribute attrib = array[0] as DescriptionAttribute;
+            return attrib.Description;
+        }
+
         public static int GetWeekNumber(this DateTime date)
         {
             return (int)(date.GetDayNumber() / 7M);

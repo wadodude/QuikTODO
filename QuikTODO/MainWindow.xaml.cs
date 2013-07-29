@@ -16,18 +16,19 @@ using System.Windows.Threading;
 
 namespace QuikTODO
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IDisposable
     {
         private TimelineWindow timeline = null;
         private DetailsWindow details = null;
         private TaskViewModel vm = null;
         private NotifyIcon ni = null;
         private CalendarWindow calendar = null;
+        private CalendarViewWindow calendarView = null;
+        private SettingsWindow settings = null;
 
         public MainWindow()
         {
             InitializeComponent();
-            //this.Loaded += MainWindow_Loaded;
             this.DataContext = new TaskViewModel();
             vm = (TaskViewModel)this.DataContext;
             ni = new System.Windows.Forms.NotifyIcon();
@@ -37,12 +38,6 @@ namespace QuikTODO
             ni.DoubleClick += ni_DoubleClick;
             ni.MouseDown += ni_MouseDown;
         }
-
-        //void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    Left = System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Width - Width;
-        //    Top = 0;
-        //}
 
         #region Focus on Mouse events
 
@@ -59,15 +54,7 @@ namespace QuikTODO
 
         void ni_DoubleClick(object sender, EventArgs e)
         {
-            if (this.WindowState != WindowState.Normal)
-            {
-                this.Show();
-                this.WindowState = WindowState.Normal;
-            }
-            else
-            {
-                this.WindowState = WindowState.Minimized;
-            }
+            ShowHideAppropriateWindow();
         }
 
         void ni_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -98,7 +85,7 @@ namespace QuikTODO
         {
             if (WindowState == System.Windows.WindowState.Minimized)
             {
-                this.Hide();
+                //this.Hide();
             }
         }
 
@@ -106,15 +93,10 @@ namespace QuikTODO
 
         private void OnKeyDownEvent(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            //if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
-            //{
-            //    Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-            //    new Action(delegate()
-            //    {
-            //        System.Windows.Controls.ContextMenu menu = (System.Windows.Controls.ContextMenu)this.FindResource("FileContextMenu");
-            //        menu.IsOpen = !menu.IsOpen;
-            //    }));
-            //}
+            if (Keyboard.IsKeyDown(Key.F7))
+            {
+                LaunchCalendarMode();
+            }
             if (Keyboard.IsKeyDown(Key.Enter))
             {
                 vm.AddExecute();
@@ -271,200 +253,6 @@ namespace QuikTODO
             }
         }
 
-        private void HourTextKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                vm.SelectedTask.ShowReminder = false;
-                return;
-            }
-            var textBox = e.Source as System.Windows.Controls.TextBox;
-            if (textBox != null)
-            {
-                if (e.Key == Key.P)
-                {
-                    textBox.Text = textBox.Text.Substring(0, 5) + "PM";
-                    textBox.Select(5, 2);
-                    e.Handled = true;
-                }
-                else if (e.Key == Key.A)
-                {
-                    textBox.Text = textBox.Text.Substring(0, 5) + "AM";
-                    textBox.Select(5, 2);
-                    e.Handled = true;
-                }
-                else if (e.Key == Key.D1 || e.Key == Key.NumPad1 || e.Key == Key.D2 || e.Key == Key.NumPad2 ||
-                    e.Key == Key.D3 || e.Key == Key.NumPad3 || e.Key == Key.D4 || e.Key == Key.NumPad4 ||
-                    e.Key == Key.D5 || e.Key == Key.NumPad5 || e.Key == Key.D6 || e.Key == Key.NumPad6 ||
-                    e.Key == Key.D7 || e.Key == Key.NumPad7 || e.Key == Key.D8 || e.Key == Key.NumPad8 ||
-                    e.Key == Key.D9 || e.Key == Key.NumPad9 || e.Key == Key.D0 || e.Key == Key.NumPad0)
-                {
-                    string i = string.Empty;
-                    if (e.Key == Key.D0 || e.Key == Key.NumPad0)
-                        i = "0";
-                    if (e.Key == Key.D1 || e.Key == Key.NumPad1)
-                        i = "1";
-                    if (e.Key == Key.D2 || e.Key == Key.NumPad2)
-                        i = "2";
-                    if (e.Key == Key.D3 || e.Key == Key.NumPad3)
-                        i = "3";
-                    if (e.Key == Key.D4 || e.Key == Key.NumPad4)
-                        i = "4";
-                    if (e.Key == Key.D5 || e.Key == Key.NumPad5)
-                        i = "5";
-                    if (e.Key == Key.D6 || e.Key == Key.NumPad6)
-                        i = "6";
-                    if (e.Key == Key.D7 || e.Key == Key.NumPad7)
-                        i = "7";
-                    if (e.Key == Key.D8 || e.Key == Key.NumPad8)
-                        i = "8";
-                    if (e.Key == Key.D9 || e.Key == Key.NumPad9)
-                        i = "9";
-
-                    if (textBox.CaretIndex == 0)
-                    {
-                        if (e.Key == Key.D0 || e.Key == Key.NumPad0)
-                        {
-                            textBox.Text = "0" + textBox.Text.Substring(1, 4) + textBox.Text.Substring(5, 2);
-                            textBox.CaretIndex = 1;
-                            e.Handled = true;
-                        }
-                        else if (e.Key == Key.D1 || e.Key == Key.NumPad1)
-                        {
-                            textBox.Text = "1" + textBox.Text.Substring(1, 4) + textBox.Text.Substring(5, 2);
-                            textBox.CaretIndex = 1;
-                            e.Handled = true;
-                        }
-                        else if (textBox.SelectionLength >= 5)
-                        {
-                            textBox.Text = "0" + i + textBox.Text.Substring(2, 3) + textBox.Text.Substring(5, 2);
-                            textBox.CaretIndex = 3;
-                            e.Handled = true;
-                        }
-                        else { e.Handled = true; }
-                    }
-                    else if (textBox.CaretIndex == 1)
-                    {
-                        if (textBox.Text.Substring(0, 1) == "0")
-                        {
-                            if (i != "0")
-                            {
-                                textBox.Text = textBox.Text.Substring(0, 1) + i + textBox.Text.Substring(2, 3) + textBox.Text.Substring(5, 2);
-                                textBox.CaretIndex = 3;
-                            }
-                            e.Handled = true;
-                        }
-                        else if (textBox.Text.Substring(0, 1) == "1")
-                        {
-                            if (e.Key == Key.D0 || e.Key == Key.NumPad0 ||
-                                e.Key == Key.D1 || e.Key == Key.NumPad1 ||
-                                e.Key == Key.D2 || e.Key == Key.NumPad2)
-                            {
-                                textBox.Text = textBox.Text.Substring(0, 1) + i + textBox.Text.Substring(2, 3) + textBox.Text.Substring(5, 2);
-                                textBox.CaretIndex = 3;
-                                e.Handled = true;
-                            }
-                            else { e.Handled = true; }
-                        }
-                    }
-                    else if (textBox.CaretIndex == 3)
-                    {
-                        if (e.Key == Key.D1 || e.Key == Key.NumPad1 || e.Key == Key.D2 || e.Key == Key.NumPad2 ||
-                            e.Key == Key.D3 || e.Key == Key.NumPad3 || e.Key == Key.D4 || e.Key == Key.NumPad4 ||
-                            e.Key == Key.D5 || e.Key == Key.NumPad5 || e.Key == Key.D0 || e.Key == Key.NumPad0)
-                        {
-                            textBox.Text = textBox.Text.Substring(0, 3) + i + textBox.Text.Substring(4, 1) + textBox.Text.Substring(5, 2);
-                            textBox.CaretIndex = 4;
-                            e.Handled = true;
-                        }
-                        else { e.Handled = true; }
-                    }
-                    else if (textBox.CaretIndex == 4)
-                    {
-                        textBox.Text = textBox.Text.Substring(0, 4) + i + textBox.Text.Substring(5, 2);
-                        textBox.CaretIndex = 5;
-                    }
-                }
-                else if (e.Key == Key.Right || e.Key == Key.Left || e.Key == Key.Tab) { }
-                else if (e.Key == Key.Back)
-                {
-                    if (textBox.CaretIndex == 5)
-                    {
-                        textBox.Text = textBox.Text.Substring(0, 4) + "0" + textBox.Text.Substring(5, 2);
-                        textBox.CaretIndex = 4;
-                        e.Handled = true;
-                    }
-                    else if (textBox.CaretIndex == 4)
-                    {
-                        textBox.Text = textBox.Text.Substring(0, 3) + "0" + textBox.Text.Substring(4, 1) + textBox.Text.Substring(5, 2);
-                        textBox.CaretIndex = 3;
-                        e.Handled = true;
-                    }
-                    else if (textBox.CaretIndex == 3)
-                    {
-                        textBox.CaretIndex = 2;
-                        e.Handled = true;
-                    }
-                    else if (textBox.CaretIndex == 2)
-                    {
-                        textBox.Text = textBox.Text.Substring(0, 1) + "0" + textBox.Text.Substring(2, 3) + textBox.Text.Substring(5, 2);
-                        textBox.CaretIndex = 1;
-                        e.Handled = true;
-                    }
-                    else if (textBox.CaretIndex == 1)
-                    {
-                        textBox.Text = "0" + textBox.Text.Substring(1, 4) + textBox.Text.Substring(5, 2);
-                        textBox.CaretIndex = 0;
-                        e.Handled = true;
-                    }
-                    else if (textBox.SelectionLength == textBox.Text.Length)
-                    {
-                        textBox.Text = "12:00AM";
-                        textBox.CaretIndex = 0;
-                        e.Handled = true;
-                    }
-                    else { e.Handled = true; }
-                }
-                else if (e.Key == Key.Delete)
-                {
-                    if (textBox.CaretIndex == 4)
-                    {
-                        textBox.Text = textBox.Text.Substring(0, 4) + "0" + textBox.Text.Substring(5, 2);
-                        textBox.CaretIndex = 5;
-                        e.Handled = true;
-                    }
-                    else if (textBox.CaretIndex == 3)
-                    {
-                        textBox.Text = textBox.Text.Substring(0, 3) + "0" + textBox.Text.Substring(4, 1) + textBox.Text.Substring(5, 2);
-                        textBox.CaretIndex = 4;
-                        e.Handled = true;
-                    }
-                    else if (textBox.CaretIndex == 2)
-                    {
-                        textBox.CaretIndex = 3;
-                        e.Handled = true;
-                    }
-                    else if (textBox.CaretIndex == 1)
-                    {
-                        textBox.Text = textBox.Text.Substring(0, 1) + "0" + textBox.Text.Substring(2, 3) + textBox.Text.Substring(5, 2);
-                        textBox.CaretIndex = 2;
-                        e.Handled = true;
-                    }
-                    else if (textBox.CaretIndex == 0)
-                    {
-                        textBox.Text = "0" + textBox.Text.Substring(1, 4) + textBox.Text.Substring(5, 2);
-                        textBox.CaretIndex = 1;
-                        e.Handled = true;
-                    }
-                    else { e.Handled = true; }
-                }
-                else
-                {
-                    e.Handled = true;
-                }
-            }
-        }
-
         private void ReminderKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             vm.SelectedTask.ShowReminder = false;
@@ -479,12 +267,8 @@ namespace QuikTODO
         {
             List<string> output = new List<string>();
             string settings = "**s" + (vm.IsSortByHighestChecked ? "1" : "0") + "h" + (vm.IsHideCompletedChecked ? "1" : "0") + "d" + (vm.IsEnableDrag ? "1" : "0");
-            if (vm.IsAutoCompletedOff) { settings += "c0"; }
-            else if (vm.IsCriticalCompleted) { settings += "c1"; }
-            else if (vm.IsHighCompleted) { settings += "c2"; }
-            else if (vm.IsMediumCompleted) { settings += "c3"; }
-            else if (vm.IsLowCompleted) { settings += "c4"; }
-            settings += "**";
+            settings += "c" + (int)vm.SelectedAutoPriority;
+            settings += "m" + (int)vm.SelectedTimespan + "**";
             output.Add(settings);
 
             if (vm.AllTasks.Any(i => i.IsDone))
@@ -497,7 +281,7 @@ namespace QuikTODO
                     {
                         time = s.ReminderTime;
                     }
-                    output.Add(time + " " + s.TaskDate.ToString("MM/dd/yyyy") + "    " + (int)s.Priority + "    " + s.TaskName.Replace(Environment.NewLine, @" \n "));
+                    output.Add(time + " " + s.TaskDate.ToString("MM/dd/yyyy") + "    " + (int)s.SelectedPriority + "    " + s.TaskName.Replace(Environment.NewLine, @" \n "));
                 }
             }
             if (vm.AllTasks.Any(i => !i.IsDone))
@@ -510,7 +294,7 @@ namespace QuikTODO
                     {
                         time = s.ReminderTime;
                     }
-                    output.Add(time + " " + s.TaskDate.ToString("MM/dd/yyyy") + "    " + (int)s.Priority + "    " + s.TaskName.Replace(Environment.NewLine, @" \n "));
+                    output.Add(time + " " + s.TaskDate.ToString("MM/dd/yyyy") + "    " + (int)s.SelectedPriority + "    " + s.TaskName.Replace(Environment.NewLine, @" \n "));
                 }
             }
             File.WriteAllLines(savePath, output.ToArray());
@@ -592,27 +376,34 @@ namespace QuikTODO
                         {
                             if (!string.IsNullOrWhiteSpace(s))
                             {
-                                if (s.StartsWith("**") && s.EndsWith("**") && s.Length == 12)
+                                if (s.StartsWith("**") && s.EndsWith("**") && s.Length == 14)
                                 {
                                     vm.IsSortByHighestChecked = s[3] == '1' ? true : false;
                                     vm.IsHideCompletedChecked = s[5] == '1' ? true : false;
                                     vm.IsEnableDrag = s[7] == '1' ? true : false;
-                                    switch (s[9])
+                                    vm.SelectedAutoPriority = (PriorityType)int.Parse(s[9].ToString());
+                                    switch (s[11])
                                     {
-                                        case '0':
-                                            vm.IsAutoCompletedOff = true;
-                                            break;
                                         case '1':
-                                            vm.IsCriticalCompleted = true;
+                                            vm.SelectedTimespan = TimeSpanType.Today;
                                             break;
                                         case '2':
-                                            vm.IsHighCompleted = true;
+                                            vm.SelectedTimespan = TimeSpanType.ThisWeek;
                                             break;
                                         case '3':
-                                            vm.IsMediumCompleted = true;
+                                            vm.SelectedTimespan = TimeSpanType.PreviousWeek;
                                             break;
                                         case '4':
-                                            vm.IsLowCompleted = true;
+                                            vm.SelectedTimespan = TimeSpanType.NextWeek;
+                                            break;
+                                        case '5':
+                                            vm.SelectedTimespan = TimeSpanType.Month;
+                                            break;
+                                        case '6':
+                                            vm.SelectedTimespan = TimeSpanType.Future;
+                                            break;
+                                        case '7':
+                                            vm.SelectedTimespan = TimeSpanType.All;
                                             break;
                                     }
                                     continue;
@@ -661,13 +452,25 @@ namespace QuikTODO
                                 }
 
                                 if (priority == (int)PriorityType.Critical)
-                                    t.PriorityColor = System.Windows.Media.Brushes.Red;
+                                {
+                                    t.SelectedPriority = PriorityType.Critical;
+                                }
                                 else if (priority == (int)PriorityType.High)
-                                    t.PriorityColor = System.Windows.Media.Brushes.Orange;
+                                {
+                                    t.SelectedPriority = PriorityType.High;
+                                }
                                 else if (priority == (int)PriorityType.Medium)
-                                    t.PriorityColor = System.Windows.Media.Brushes.Yellow;
+                                {
+                                    t.SelectedPriority = PriorityType.Medium;
+                                }
                                 else if (priority == (int)PriorityType.Low)
-                                    t.PriorityColor = System.Windows.Media.Brushes.LimeGreen;
+                                {
+                                    t.SelectedPriority = PriorityType.Low;
+                                }
+                                else
+                                {
+                                    t.SelectedPriority = PriorityType.Low;
+                                }
                                 t.TaskName = name;
                                 t.TaskDate = d;
                                 t.IsDone = isCompleted;
@@ -806,40 +609,7 @@ namespace QuikTODO
 
         private void ExitClick(object sender, RoutedEventArgs e)
         {
-            if (vm.NeedsToSave)
-            {
-                if (vm.PromptWindow == null)
-                {
-                    vm.PromptWindow = new PromptWindow("Exiting...", "Do you want to save your changes now?", PromptType.YesNoCancel);
-                    if (vm.PromptWindow.ShowDialog().HasValue)
-                    {
-                        if (vm.PromptWindow.Response == PromptResponse.Yes)
-                        {
-                            DefaultSaveMethod();
-                            CloseApp();
-                        }
-                        else if (vm.PromptWindow.Response == PromptResponse.No)
-                        {
-                            CloseApp();
-                        }
-                    }
-
-                    vm.PromptWindow = null;
-
-                    //var result = System.Windows.MessageBox.Show("Do you want to save your changes now?", "Exiting...", MessageBoxButton.YesNoCancel, MessageBoxImage.Exclamation,
-                    //    MessageBoxResult.Yes, System.Windows.MessageBoxOptions.ServiceNotification);
-                    //if (result == MessageBoxResult.Yes)
-                    //{
-                    //    DefaultSaveMethod();
-                    //    CloseApp();
-                    //}
-                    //else if (result == MessageBoxResult.No)
-                    //{
-                    //    CloseApp();
-                    //}
-                }
-            }
-            else { CloseApp(); }
+            Close();
         }
 
         private void MinimizeClick(object sender, RoutedEventArgs e)
@@ -908,8 +678,120 @@ namespace QuikTODO
 
         private void ShowClick(object sender, RoutedEventArgs e)
         {
-            this.Show();
-            this.WindowState = System.Windows.WindowState.Normal;
+            //ShowHideAppropriateWindow();
+            if (vm.SelectedAppMode == AppMode.Priority)
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            }
+            else if (vm.SelectedAppMode == AppMode.Calendar)
+            {
+                if (calendarView != null)
+                {
+                    calendarView.Show();
+                    calendarView.WindowState = WindowState.Normal;
+                }
+                else
+                {
+                    vm.SelectedAppMode = AppMode.Priority;
+                    this.Show();
+                }
+            }
+            else if (vm.SelectedAppMode == AppMode.Timeline)
+            {
+                if (timeline != null)
+                {
+                    timeline.Show();
+                    timeline.WindowState = WindowState.Normal;
+                }
+                else
+                {
+                    vm.SelectedAppMode = AppMode.Priority;
+                    this.Show();
+                }
+            }
+        }
+
+        private void ShowHideAppropriateWindow()
+        {
+            switch (vm.SelectedAppMode)
+            {
+                case AppMode.Calendar:
+                    if (calendarView != null)
+                    {
+                        if (calendarView.WindowState == WindowState.Minimized)
+                        {
+                            calendarView.Show();
+                            calendarView.WindowState = WindowState.Normal;
+                        }
+                        else
+                        {
+                            //calendarView.Hide();
+                            calendarView.WindowState = WindowState.Minimized;
+                        }
+                    }
+                    else
+                    {
+                        if (this.WindowState == WindowState.Minimized)
+                        {
+                            this.Show();
+                            this.WindowState = WindowState.Normal;
+                        }
+                        else
+                        {
+                            //this.Hide();
+                            this.WindowState = WindowState.Minimized;
+                        }
+                    }
+                    break;
+                case AppMode.Timeline:
+                    if (timeline != null)
+                    {
+                        if (timeline.WindowState == WindowState.Minimized)
+                        {
+                            timeline.Show();
+                            timeline.WindowState = WindowState.Normal;
+                        }
+                        else
+                        {
+                            //timeline.Hide();
+                            timeline.WindowState = WindowState.Minimized;
+                        }
+                    }
+                    else
+                    {
+                        if (this.WindowState == WindowState.Minimized)
+                        {
+                            this.Show();
+                            this.WindowState = WindowState.Normal;
+                        }
+                        else
+                        {
+                            //this.Hide();
+                            this.WindowState = WindowState.Minimized;
+                        }
+                    }
+                    break;
+                case AppMode.Priority:
+                    if (this.WindowState == WindowState.Minimized)
+                    {
+                        this.Show();
+                        this.WindowState = WindowState.Normal;
+                    }
+                    else
+                    {
+                        //this.Hide();
+                        this.WindowState = WindowState.Minimized;
+                    }
+                    break;
+                default:
+                    this.Show();
+                    this.WindowState = WindowState.Normal;
+                    vm.SelectedAppMode = AppMode.Priority;
+                    calendarView = null;
+                    timeline = null;
+                    break;
+            }
         }
 
         #region Deprecated code
@@ -1051,20 +933,6 @@ namespace QuikTODO
             }
         }
 
-        private void HourDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            var textBox = e.Source as System.Windows.Controls.TextBox;
-            if (textBox != null)
-            {
-                if (textBox.CaretIndex > 4)
-                    textBox.Select(5, 2);
-                else
-                    textBox.Select(0, 5);
-
-                e.Handled = true;
-            }
-        }
-
         #endregion
 
         private void TaskNameTextBoxLoaded(object sender, RoutedEventArgs e)
@@ -1072,11 +940,21 @@ namespace QuikTODO
             TaskNameTextBox.Focus();
         }
 
-        private void StartTimelineClick(object sender, MouseButtonEventArgs e)
+        private void TimelineModeClick(object sender, RoutedEventArgs e)
         {
-            timeline = new TimelineWindow(vm.TaskCollection);
+            //this.Hide();
+            timeline = new TimelineWindow(vm);
             timeline.ShowDialog();
-            e.Handled = true;
+            timeline = null;
+
+            if (timeline.IsDone)
+            {
+                timeline = null;
+                vm.SelectedAppMode = AppMode.Priority;
+                vm.RefreshModeOptions();
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            }
         }
 
         private void DockRight(object sender, RoutedEventArgs e)
@@ -1107,158 +985,80 @@ namespace QuikTODO
             vm.RefreshTasks();
         }
 
-        private void HourTextBox_MouseMove_1(object sender, System.Windows.Input.MouseEventArgs e)
+        private void CalendarModeClick(object sender, RoutedEventArgs e)
         {
-            var textBox = sender as System.Windows.Controls.TextBox;
-            if (textBox != null)
+            LaunchCalendarMode();
+        }
+
+        private void LaunchCalendarMode()
+        {
+            this.Hide();
+            calendarView = new CalendarViewWindow(vm);
+            calendarView.ShowDialog();
+            //calendarView = null;
+            if (calendarView.IsDone)
             {
-                if (!textBox.IsFocused)
+                calendarView = null;
+                vm.SelectedAppMode = AppMode.Priority;
+                vm.RefreshModeOptions();
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            }
+        }
+
+        public void Dispose()
+        {
+            ni.Visible = false;
+            ni = null;
+            Close();
+        }
+
+        private void SettingsClick(object sender, RoutedEventArgs e)
+        {
+            settings = new SettingsWindow(vm);
+            settings.ShowDialog();
+            vm.NeedsToSave = true;
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            e.Cancel = !CanClose();
+            if (e.Cancel == false)
+            {
+                ni.Dispose();
+                ni = null;
+            }
+        }
+
+        private bool CanClose()
+        {
+            bool canClose = false;
+            if (vm.NeedsToSave)
+            {
+                if (vm.PromptWindow == null)
                 {
-                    textBox.Focus();
+                    vm.PromptWindow = new PromptWindow("Exiting...", "Do you want to save your changes now?", PromptType.YesNoCancel);
+                    if (vm.PromptWindow.ShowDialog().HasValue)
+                    {
+                        if (vm.PromptWindow.Response == PromptResponse.Yes)
+                        {
+                            DefaultSaveMethod();
+                            canClose = true;
+                        }
+                        else if (vm.PromptWindow.Response == PromptResponse.No)
+                        {
+                            canClose = true;
+                        }
+                    }
+
+                    vm.PromptWindow = null;
                 }
             }
+            else
+            {
+                canClose = true;
+            }
+            return canClose;
         }
     }
 }
-
-#region Comments
-//private void SubscribeToItemsSourceChanged()
-//{
-//    if (ListBox != null)
-//    {
-//        DependencyPropertyDescriptor dependencyPropertyDescriptor =
-//                DependencyPropertyDescriptor.FromProperty(System.Windows.Controls.ListBox.ItemsSourceProperty, typeof(System.Windows.Controls.ListBox));
-
-//        if (dependencyPropertyDescriptor != null)
-//        {
-//            dependencyPropertyDescriptor.AddValueChanged(ListBox, ItemsSourceChanged);
-//        }
-//    }
-//}
-
-//private void ItemsSourceChanged(object sender, EventArgs e)
-//{
-//    SubscribeToCollectionChanged();
-//}
-
-//public INotifyCollectionChanged _collectionChanged { get; set; }
-
-//private void SubscribeToCollectionChanged()
-//{
-//    //Unsubscribe from the original collection
-//    if (_collectionChanged != null)
-//    {
-//        _collectionChanged.CollectionChanged -= CollectionChangedHandler;
-//    }
-
-//    _collectionChanged = ListBox.ItemsSource as INotifyCollectionChanged;
-//    if (_collectionChanged != null)
-//    {
-//        _collectionChanged.CollectionChanged +=
-//            new NotifyCollectionChangedEventHandler(CollectionChangedHandler);
-//    }
-//}
-
-//private void CollectionChangedHandler(object sender, NotifyCollectionChangedEventArgs e)
-//{
-//    if (e.Action == NotifyCollectionChangedAction.Add)
-//    {
-//        ListBox.ScrollIntoView(e.NewItems[0]);
-//        ListBox.SelectedItem = e.NewItems[0];
-//        if (ListBox.HasItems && ListBox.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
-//        {
-//            var item = (ListBoxItem)ListBox.ItemContainerGenerator.ContainerFromItem(ListBox.SelectedItem);
-//            item.Loaded += new RoutedEventHandler(ItemLoadedHandler);
-//        }
-//        else
-//        {
-//            SubscribeToContainerStatusChanged();
-//        }
-//    }
-//    else if (e.Action == NotifyCollectionChangedAction.Remove)
-//    {
-//        if (ListBox.HasItems)
-//        {
-//            var item = (ListBoxItem)ListBox.ItemContainerGenerator.ContainerFromItem(ListBox.Items[ListBox.Items.Count - 1]);
-//            ListBox.ScrollIntoView(item);
-//            ListBox.SelectedItem = item;
-//            SetFocusToElement(item, "LbTextBox");
-//        }
-//    }
-//}
-
-//private void SubscribeToContainerStatusChanged()
-//{
-//    ListBox.ItemContainerGenerator.StatusChanged += new EventHandler(ItemContainerGenerator_StatusChanged);
-//}
-
-//private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
-//{
-//    if (ListBox.HasItems && ListBox.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
-//    {
-//        ListBox.ItemContainerGenerator.StatusChanged -= ItemContainerGenerator_StatusChanged;
-//        var item = (ListBoxItem)ListBox.ItemContainerGenerator.ContainerFromItem(ListBox.SelectedItem);
-//        if (item != null)
-//        {
-//            item.Loaded += new RoutedEventHandler(ItemLoadedHandler);
-//        }
-//    }
-//}
-
-//private void ItemLoadedHandler(object sender, RoutedEventArgs e)
-//{
-//    var listBoxItem = sender as ListBoxItem;
-//    if (listBoxItem != null)
-//    {
-//        SetFocusToElement(listBoxItem, "LbTextBox");
-//        listBoxItem.Loaded -= ItemLoadedHandler;
-//    }
-//}
-
-//private bool SetFocusToElement(ListBoxItem listBoxItem, string elementName)
-//{
-//    bool found = false;
-//    var childElement = FindFirstChildByName(listBoxItem, elementName) as FrameworkElement;
-//    if (childElement != null)
-//    {
-//        //This works
-//        childElement.Focus();
-//        found = true;
-//    }
-//    return found;
-//}
-
-//public DependencyObject FindFirstChildByName(DependencyObject parentReference, string childName)
-//{
-//    DependencyObject foundChild = null;
-//    if (parentReference != null)
-//    {
-//        int childrenCount = VisualTreeHelper.GetChildrenCount(parentReference);
-//        for (int i = 0; i < childrenCount; i++)
-//        {
-//            var child = VisualTreeHelper.GetChild(parentReference, i);
-//            //If this is the matching child, stop
-//            var frameworkElement = child as FrameworkElement;
-//            if (frameworkElement != null && frameworkElement.Name == childName)
-//            {
-//                foundChild = child;
-//                break;
-//            }
-//            //If it is not the matching child, iterate through the children's elements
-//            else
-//            {
-//                foundChild = FindFirstChildByName(child, childName);
-
-//                var secondaryChild = foundChild as FrameworkElement;
-//                if (secondaryChild != null && secondaryChild.Name == childName)
-//                {
-//                    break;
-//                }
-//            }
-//        }
-//    }
-
-//    return foundChild;
-//}
-
-#endregion

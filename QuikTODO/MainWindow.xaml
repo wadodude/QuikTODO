@@ -2,14 +2,17 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
-        Title="{Binding MainDisplayName}"
+        xmlns:v="clr-namespace:QuikTODO"
+        Title="QuikTODO"
         Width="768"
+        MinWidth="400"
         Height="700"
-        AllowsTransparency="True"
-        Background="Transparent"
-        Topmost="True"
+        AllowsTransparency="False"
+        Background="Black"
+        Topmost="False"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="None">
+        Icon="/Icons/clipboard.ico"
+        WindowStyle="SingleBorderWindow">
 
     <Window.Resources>
         <ContextMenu x:Key="NotifierContextMenu" Placement="MousePoint">
@@ -70,17 +73,11 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="{x:Type MenuItem}">
-            <Setter Property="Background" Value="Black" />
-            <Setter Property="Foreground" Value="White" />
-        </Style>
-
     </Window.Resources>
     <Grid MouseLeftButtonDown="DragWindow">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="450" />
-            <!--  600  -->
+            <ColumnDefinition Width="*" />
             <ColumnDefinition Width="100" />
             <ColumnDefinition Width="20" />
         </Grid.ColumnDefinitions>
@@ -91,11 +88,6 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.RowSpan="3"
-                Grid.ColumnSpan="4"
-                BorderBrush="Red"
-                BorderThickness="2" />
-
         <Label Grid.Row="0"
                Grid.Column="0"
                Grid.ColumnSpan="4"
@@ -105,19 +97,37 @@
         <Rectangle Grid.Row="1"
                    Grid.Column="0"
                    Grid.ColumnSpan="4"
-                   Height="10"
-                   Fill="SkyBlue" />
-        <TextBlock Grid.Row="1"
-                   Grid.Column="0"
-                   Grid.ColumnSpan="4"
-                   Height="10"
+                   Height="18"
+                   Fill="Black" />
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <ComboBox Grid.Column="4"
+                      Height="18"
+                      Width="90"
+                      FontSize="10"
+                      HorizontalAlignment="Right"
+                      ItemsSource="{Binding TimespanCollection}" 
+                      SelectedItem="{Binding SelectedTimespanItem}"
+                      DisplayMemberPath="Description"
+                      ToolTip="{Binding SelectedTimespanItem.Description}"/>
+            
+            <TextBlock Grid.Column="2"
+                   Height="18"
                    HorizontalAlignment="Center"
-                   Background="SkyBlue"
-                   FontSize="8"
+                   Background="Black"
+                   FontSize="10"
                    FontStretch="UltraExpanded"
-                   FontWeight="Bold"
-                   Foreground="Black"
+                   FontWeight="Normal"
+                   Foreground="White"
                    Text="{Binding TimespanDescription}" />
+        </Grid>
 
         <Grid Grid.Row="0"
               Grid.Column="0"
@@ -130,10 +140,8 @@
             <Image Grid.Column="0"
                    Width="16"
                    Height="16"
-                   Cursor="Hand"
-                   MouseLeftButtonDown="StartTimelineClick"
-                   Source="Icons/clipboard.ico"
-                   ToolTip="Timeline View" />
+                   Source="/Icons/clipboard.ico"
+                   ToolTip="Priority Mode" />
             <Label Grid.Column="1"
                    MaxWidth="300"
                    HorizontalAlignment="Stretch"
@@ -183,62 +191,15 @@
                               Header="Exit" />
                 </MenuItem>
                 <MenuItem Header="Edit">
-                    <MenuItem Header="Auto Prioritize">
-                        <MenuItem Header="Completed Tasks">
-                            <MenuItem Header="Auto Off"
-                                      IsCheckable="True"
-                                      IsChecked="{Binding IsAutoCompletedOff}" />
-                            <MenuItem Header="Low"
-                                      IsCheckable="True"
-                                      IsChecked="{Binding IsLowCompleted}" />
-                            <MenuItem Header="Medium"
-                                      IsCheckable="True"
-                                      IsChecked="{Binding IsMediumCompleted}" />
-                            <MenuItem Header="High"
-                                      IsCheckable="True"
-                                      IsChecked="{Binding IsHighCompleted}" />
-                            <MenuItem Header="Critical"
-                                      IsCheckable="True"
-                                      IsChecked="{Binding IsCriticalCompleted}" />
-                        </MenuItem>
-                        <MenuItem Header="Enable Drag"
-                                  IsCheckable="True"
-                                  IsChecked="{Binding IsEnableDrag}" />
-                    </MenuItem>
                     <MenuItem Click="ClearAllClick" Header="Clear All Tasks" />
                 </MenuItem>
                 <MenuItem Header="View">
-                    <MenuItem Header="Time Span">
-                        <MenuItem Header="Today"
-                                  IsCheckable="True"
-                                  IsChecked="{Binding ShowTodayTasks}" />
-                        <MenuItem Header="Week">
-                            <MenuItem Header="This Week"
-                                      IsCheckable="True"
-                                      IsChecked="{Binding ShowThisWeekTasks}" />
-                            <MenuItem Header="Next Week"
-                                      IsCheckable="True"
-                                      IsChecked="{Binding ShowNextWeekTasks}" />
-                            <MenuItem Header="Prev Week"
-                                      IsCheckable="True"
-                                      IsChecked="{Binding ShowPreviousWeekTasks}" />
-                        </MenuItem>
-                        <MenuItem Header="This Month"
-                                  IsCheckable="True"
-                                  IsChecked="{Binding ShowMonthTasks}" />
-                        <MenuItem Header="Future"
-                                  IsCheckable="True"
-                                  IsChecked="{Binding ShowFutureTasks}" />
-                        <MenuItem Header="All"
-                                  IsCheckable="True"
-                                  IsChecked="{Binding ShowAllTasks}" />
+                    <MenuItem Header="Mode">
+                        <MenuItem Header="Priority" IsCheckable="True" IsChecked="{Binding IsPriorityMode}"/>
+                        <MenuItem Header="Timeline" IsCheckable="True" IsEnabled="False" IsChecked="{Binding IsTimelineMode}" Click="TimelineModeClick"/>
+                        <MenuItem Header="Calendar" IsCheckable="True" IsChecked="{Binding IsCalendarMode}" Click="CalendarModeClick"/>
                     </MenuItem>
-                    <MenuItem Header="Sort By Highest Priority"
-                              IsCheckable="True"
-                              IsChecked="{Binding IsSortByHighestChecked}" />
-                    <MenuItem Header="Hide Completed Tasks"
-                              IsCheckable="True"
-                              IsChecked="{Binding IsHideCompletedChecked}" />
+                    <MenuItem Header="Settings" Click="SettingsClick" />
                 </MenuItem>
                 <!--
                     <MenuItem Header="Dock">
@@ -283,19 +244,19 @@
                  Tag="Type TODO task here"
                  Text="{Binding TaskToAdd,
                                 UpdateSourceTrigger=PropertyChanged}" />
-        <DatePicker Grid.Row="2"
+        <v:DatePickerControl Grid.Row="2"
                     Grid.Column="2"
                     PreviewKeyDown="OnDateKeyDownEvent"
                     SelectedDate="{Binding TaskDate}"
                     TabIndex="20"
                     ToolTip="Choose Date">
-            <DatePicker.RenderTransform>
+            <v:DatePickerControl.RenderTransform>
                 <ScaleTransform CenterX="0"
                                 CenterY="0"
                                 ScaleX="1.05"
                                 ScaleY="1.15" />
-            </DatePicker.RenderTransform>
-        </DatePicker>
+            </v:DatePickerControl.RenderTransform>
+        </v:DatePickerControl>
         <Label x:Name="PriorityLabel"
                Grid.Row="2"
                Grid.Column="3"
@@ -303,11 +264,13 @@
                MouseLeftButtonDown="PriorityLabelMouseClick"
                TabIndex="30"
                ToolTip="{Binding PriorityTooltip}" />
-        <!--  <ScrollViewer Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">  -->
+        
         <ListBox x:Name="ListBox"
                  Grid.Row="3"
                  Grid.Column="0"
                  Grid.ColumnSpan="4"
+                 HorizontalAlignment="Stretch"
+                 HorizontalContentAlignment="Stretch"
                  MaxHeight="350"
                  ItemsSource="{Binding TaskCollection}"
                  KeyboardNavigation.IsTabStop="False"
@@ -323,17 +286,20 @@
                     <Setter Property="ItemTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <Grid Height="33"
+                                <Grid Height="31"
                                       PreviewKeyDown="OnKeyDownEvent"
                                       PreviewLostKeyboardFocus="EditTaskPreviewLostFocus"
                                       Visibility="{Binding ShowThisTask,
                                                            Converter={StaticResource boolVisibilityConverter}}">
-                                    <Grid Visibility="{Binding ShowReminder, Converter={StaticResource inverseBoolVisibilityConverter}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Grid.Column="0" HorizontalAlignment="Stretch"
+                                          Visibility="{Binding ShowReminder, Converter={StaticResource inverseBoolVisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="420" />
-                                            <!--  570  -->
-                                            <ColumnDefinition Width="130" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="120" />
                                             <ColumnDefinition Width="20" />
                                         </Grid.ColumnDefinitions>
                                         <CheckBox Grid.Column="0"
@@ -345,6 +311,8 @@
                                                   IsChecked="{Binding IsDone}" />
                                         <Label Grid.Column="1"
                                                Content="{Binding TaskName}"
+                                               HorizontalAlignment="Stretch"
+                                               HorizontalContentAlignment="Stretch"
                                                FontSize="14"
                                                MouseDoubleClick="TaskMouseDoubleClick"
                                                Visibility="{Binding IsEditable,
@@ -383,23 +351,6 @@
                                                MouseDoubleClick="TaskMouseDoubleClick"
                                                Visibility="{Binding IsEditable,
                                                                     Converter={StaticResource boolVisibilityConverter}}" />
-                                        <!--
-                                            <DatePicker Grid.Column="2"
-                                            GotFocus="OnListBoxItemGotFocus"
-                                            KeyDown="EditDateTaskKeyDown"
-                                            SelectedDate="{Binding TaskDate}"
-                                            TabIndex="20"
-                                            ToolTip="Priority Date"
-                                            Visibility="{Binding IsEditable,
-                                            Converter={StaticResource boolVisibilityConverter}}">
-                                            <DatePicker.RenderTransform>
-                                            <ScaleTransform CenterX="0"
-                                            CenterY="0"
-                                            ScaleX="1.05"
-                                            ScaleY="1.15" />
-                                            </DatePicker.RenderTransform>
-                                            </DatePicker>
-                                        -->
                                         <Label Grid.Column="3"
                                                Background="{Binding PriorityColor}"
                                                MouseDoubleClick="ListBoxLabelMouseDoubleClick" />
@@ -418,19 +369,10 @@
                                         <Label Grid.Column="1"
                                                Content="Reminder Time:"
                                                FontSize="14" />
-                                        <TextBox x:Name="HourTextBox"
-                                                 Grid.Column="2"
-                                                 FontSize="18"
-                                                 FontStretch="UltraExpanded"
-                                                 FontWeight="Bold"
-                                                 GotFocus="OnListBoxItemGotFocus"
-                                                 KeyDown="EditTaskKeyDown"
-                                                 MaxLength="7"
-                                                 MouseMove="HourTextBox_MouseMove_1"
-                                                 PreviewKeyDown="HourTextKeyDown"
-                                                 PreviewMouseDoubleClick="HourDoubleClick"
-                                                 Text="{Binding ReminderTime,
-                                                                UpdateSourceTrigger=PropertyChanged}" />
+                                        <v:TimeControl Grid.Column="2" 
+                                                       GotFocus="OnListBoxItemGotFocus" 
+                                                       KeyDown="EditTaskKeyDown" 
+                                                       Text="{Binding ReminderTime, UpdateSourceTrigger=PropertyChanged}"/>
                                         <Button Grid.Column="3"
                                                 Click="SaveReminderClick"
                                                 Content="Ok" />
@@ -442,10 +384,11 @@
                                         <ContextMenu>
                                             <MenuItem Click="ViewDetailsClick" Header="Details" />
                                             <MenuItem Click="AddReminderClick" Header="{Binding ReminderHeader}" />
-                                            <MenuItem Click="EditTaskDateClick" Header="Edit Task Date" />
+                                            <!--<MenuItem Click="EditTaskDateClick" Header="Edit Task Date" />-->
                                             <MenuItem Click="RemoveSelectedTaskClick" Header="Remove Task" />
                                         </ContextMenu>
                                     </Grid.ContextMenu>
+
                                 </Grid>
                             </DataTemplate>
                         </Setter.Value>
@@ -454,11 +397,11 @@
             </ListBox.Style>
         </ListBox>
         <!--  </ScrollViewer>  -->
-        <Grid.RenderTransform>
+        <!--<Grid.RenderTransform>
             <ScaleTransform CenterX="0"
                             CenterY="0"
                             ScaleX="1.2"
                             ScaleY="1.2" />
-        </Grid.RenderTransform>
+        </Grid.RenderTransform>-->
     </Grid>
 </Window>
